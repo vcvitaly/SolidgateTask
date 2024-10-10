@@ -1,0 +1,11 @@
+spring:
+  application:
+    name: SolidgateTask
+  datasource:
+    url: jdbc:postgresql://${SOLIDGATE_DB_HOST:localhost}:${SOLIDGATE_DB_PORT:5432}/${SOLIDGATE_DB_NAME:solidgate_task}?currentShema=public
+    username: ${SOLIDGATE_DB_USER:postgres}
+    password: ${SOLIDGATE_DB_PASSW:postgres}
+    driverClassName: org.postgresql.Driver
+    flyway:
+      locations: classpath:db/migration
+      baselineOnMigrate: true
