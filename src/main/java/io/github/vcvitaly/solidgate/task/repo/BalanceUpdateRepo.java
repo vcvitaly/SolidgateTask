@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface BalanceUpdateRepo {
 
-    void createBalanceUpdateRequest(String idempotencyKey, Map<Integer, Integer> req);
+    void createBalanceUpdateRequest(String idempotencyKey, String req);
 
     Set<Integer> getExistingUserIds(Set<Integer> userIds);
 
