@@ -23,23 +23,29 @@ public class BalanceUpdateValidator {
 
         final Set<Integer> existingUserIds = repo.getExistingUserIds(req.keySet());
 
-        final Sets.SetView<Integer> difference = Sets.difference(req.keySet(), existingUserIds);
+        validateAllUsersExist(req, existingUserIds);
 
-        if (!difference.isEmpty()) {
-            throw new UsersNotFoundException();
-        }
-
-        req.values().stream()
-                .filter(bal -> bal < 0)
-                .findFirst()
-                .ifPresent(negativeBal -> {
-                    throw new NegativeBalanceException();
-                });
+        validateBalancesArePositive(req);
     }
 
     public void validateIdempotencyKeyExists(String idempotencyKey) {
         if (!repo.existsRequest(idempotencyKey)) {
             throw new IdempotencyKeyNotFoundException(idempotencyKey);
         }
+    }
+
+    private void validateAllUsersExist(Map<Integer, Integer> req, Set<Integer> existingUserIds) {
+        if (req.size() != existingUserIds.size()) {
+            throw new UsersNotFoundException();
+        }
+    }
+
+    private void validateBalancesArePositive(Map<Integer, Integer> req) {
+        req.values().stream()
+                .filter(bal -> bal < 0)
+                .findFirst()
+                .ifPresent(negativeBal -> {
+                    throw new NegativeBalanceException();
+                });
     }
 }

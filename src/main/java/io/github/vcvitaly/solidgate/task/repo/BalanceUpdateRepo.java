@@ -3,12 +3,10 @@ package io.github.vcvitaly.solidgate.task.repo;
 import io.github.vcvitaly.solidgate.task.model.BalanceUpdateRequest;
 import java.util.Map;
 import java.util.Set;
-import org.springframework.stereotype.Repository;
 
-@Repository
 public interface BalanceUpdateRepo {
 
-    void createBalanceUpdateRequest(String idempotencyKey, Map<Integer, Integer> req);
+    void createBalanceUpdateRequest(String idempotencyKey, String req);
 
     Set<Integer> getExistingUserIds(Set<Integer> userIds);
 
