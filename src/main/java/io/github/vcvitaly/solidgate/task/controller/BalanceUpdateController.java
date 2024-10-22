@@ -1,10 +1,13 @@
 package io.github.vcvitaly.solidgate.task.controller;
 
+import io.github.vcvitaly.solidgate.task.dto.BalanceUpdateRequestDto;
+import io.github.vcvitaly.solidgate.task.exception.IdempotencyKeyAlreadyExistsException;
 import io.github.vcvitaly.solidgate.task.exception.IdempotencyKeyNotFoundException;
 import io.github.vcvitaly.solidgate.task.exception.NegativeBalanceException;
 import io.github.vcvitaly.solidgate.task.exception.UsersNotFoundException;
 import io.github.vcvitaly.solidgate.task.service.BalanceUpdateService;
 import io.github.vcvitaly.solidgate.task.service.BalanceUpdateValidator;
+import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -30,17 +33,25 @@ public class BalanceUpdateController {
     public void setUsersBalance(@PathVariable("idempotencyKey") String idempotencyKey,
                                 @RequestBody Map<Integer, Integer> req) {
         validator.validateUpdateRequest(idempotencyKey, req);
+
+        service.createUpdateRequest(idempotencyKey, req);
     }
 
     @GetMapping("/in-progress-requests")
-    public String getInProgressRequests() {
-        return null;
+    public List<BalanceUpdateRequestDto> getInProgressRequests() {
+        return service.getInProgressRequests();
     }
 
     @GetMapping("/{idempotencyKey}/update-request-status")
-    public String getUpdateRequestStatus(@PathVariable("idempotencyKey") String idempotencyKey) {
+    public BalanceUpdateRequestDto getUpdateRequest(@PathVariable("idempotencyKey") String idempotencyKey) {
         validator.validateIdempotencyKeyExists(idempotencyKey);
-        return null;
+        return service.getUpdateRequest(idempotencyKey);
+    }
+
+    @ExceptionHandler(IdempotencyKeyAlreadyExistsException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public String handleException(IdempotencyKeyAlreadyExistsException e) {
+        return e.getMessage();
     }
 
     @ExceptionHandler(IdempotencyKeyNotFoundException.class)
