@@ -37,8 +37,8 @@ public class JdbcBalanceUpdateRepo implements BalanceUpdateRepo {
             """;
 
     private static final String GET_REQ_FOR_UPDATE_QUERY = """
-            SELECT * FROM balance_update_requests WHERE status IN (:statuses) ORDER BY id
-            FOR UPDATE SKIP LOCKED LIMIT 1
+            SELECT * FROM balance_update_requests WHERE status IN (:statuses) ORDER BY id LIMIT 1
+            FOR UPDATE SKIP LOCKED
             """;
 
     private static final String GET_IN_PROGRESS_REQS_QUERY = """
@@ -84,18 +84,22 @@ public class JdbcBalanceUpdateRepo implements BalanceUpdateRepo {
 
     @Override
     public Optional<BalanceUpdateRequest> selectRequestForUpdate(Set<BalanceUpdateRequestStatus> statuses) {
-        final Map<String, Object> params = Map.of("statuses", statuses);
+        final Map<String, Object> params = statusesToParams(statuses);
         return queryForOptional(GET_REQ_FOR_UPDATE_QUERY, params);
     }
 
     @Override
     public List<BalanceUpdateRequest> selectAllRequestsByStatuses(Set<BalanceUpdateRequestStatus> statuses) {
-        final Map<String, Object> params = Map.of(
+        final Map<String, Object> params = statusesToParams(statuses);
+
+        return jdbcTemplate.query(GET_IN_PROGRESS_REQS_QUERY, params, DataClassRowMapper.newInstance(BalanceUpdateRequest.class));
+    }
+
+    private Map<String, Object> statusesToParams(Set<BalanceUpdateRequestStatus> statuses) {
+        return Map.of(
                 "statuses",
                 statuses.stream().map(BalanceUpdateRequestStatus::name).collect(Collectors.toSet())
         );
-
-        return jdbcTemplate.query(GET_IN_PROGRESS_REQS_QUERY, params, DataClassRowMapper.newInstance(BalanceUpdateRequest.class));
     }
 
     @Override
