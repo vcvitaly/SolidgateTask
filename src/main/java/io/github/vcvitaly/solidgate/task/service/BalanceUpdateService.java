@@ -45,9 +45,7 @@ public class BalanceUpdateService {
     }
 
     @Transactional
-    public UUID processRequest() {
-        log.info("Processing balance update request");
-
+    public Optional<UUID> processRequest() {
         Optional<BalanceUpdateRequest> reqForUpdate;
 
         try {
@@ -58,7 +56,7 @@ public class BalanceUpdateService {
 
         try {
             reqForUpdate.ifPresent(this::processRequest);
-            return reqForUpdate.get().idempotencyKey();
+            return reqForUpdate.map(BalanceUpdateRequest::idempotencyKey);
         } catch (Exception e) {
             throw new BalanceUpdateException(reqForUpdate.get().idempotencyKey().toString(), e);
         }
@@ -78,6 +76,7 @@ public class BalanceUpdateService {
     }
 
     private void processRequest(BalanceUpdateRequest req) {
+        log.info("Processing balance update request");
         final Map<Integer, Integer> map = JsonUtil.strToMap(req.request(), Integer.class, Integer.class);
         balanceUpdateRepo.updateUserBalances(map);
     }

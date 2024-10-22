@@ -4,6 +4,7 @@ import io.github.vcvitaly.solidgate.task.enumeration.BalanceUpdateRequestStatus;
 import io.github.vcvitaly.solidgate.task.exception.BalanceUpdateException;
 import io.github.vcvitaly.solidgate.task.exception.RequestLockException;
 import io.github.vcvitaly.solidgate.task.model.BalanceUpdateRequestUpdate;
+import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,7 +22,10 @@ public class BalanceUpdateScheduler {
     public void processRequest() {
         BalanceUpdateRequestUpdate update = null;
         try {
-            final UUID processed = service.processRequest();
+            final Optional<UUID> processed = service.processRequest();
+            if (processed.isEmpty()) {
+                return;
+            }
             log.info("Updated user balances for idempotency key: " + processed);
             update = new BalanceUpdateRequestUpdate(
                     processed.toString(), BalanceUpdateRequestStatus.COMPLETED.name(), null
