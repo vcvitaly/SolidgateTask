@@ -8,10 +8,12 @@ import io.github.vcvitaly.solidgate.task.repo.BalanceUpdateRepo;
 import io.github.vcvitaly.solidgate.task.util.JsonUtil;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -32,9 +34,17 @@ public class BalanceUpdateService {
     }
 
     public List<BalanceUpdateRequestDto> getInProgressRequests() {
-        return repo.selectAllRequestsByStatuses(Set.of(BalanceUpdateRequestStatus.NEW, BalanceUpdateRequestStatus.IN_PROGRESS)).stream()
+        return repo.selectAllRequestsByStatuses(Set.of(BalanceUpdateRequestStatus.IN_PROGRESS)).stream()
                 .map(this::toBalanceUpdReqDto)
                 .toList();
+    }
+
+    @Transactional
+    public void processRequest() {
+        final Optional<BalanceUpdateRequest> req = repo.selectAllRequestsByStatuses(Set.of(BalanceUpdateRequestStatus.IN_PROGRESS)).stream()
+                .findFirst();
+
+        req.ifPresent(this::processRequest);
     }
 
     private BalanceUpdateRequestDto toBalanceUpdReqDto(BalanceUpdateRequest req) {
@@ -43,5 +53,15 @@ public class BalanceUpdateService {
                 .status(req.status())
                 .error(req.error())
                 .build();
+    }
+
+    private void processRequest(BalanceUpdateRequest req) {
+        repo.selectRequestForUpdate(req.idempotencyKey().toString());
+
+        final Map<Integer, Integer> map = JsonUtil.strToMap(req.request(), Integer.class, Integer.class);
+
+        repo.updateUserBalances(map);
+
+        log.info("Updated user balances for idempotency key: " + req.idempotencyKey());
     }
 }

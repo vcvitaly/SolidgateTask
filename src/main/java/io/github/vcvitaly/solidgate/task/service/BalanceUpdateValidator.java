@@ -5,6 +5,7 @@ import io.github.vcvitaly.solidgate.task.exception.IdempotencyKeyNotFoundExcepti
 import io.github.vcvitaly.solidgate.task.exception.NegativeBalanceException;
 import io.github.vcvitaly.solidgate.task.exception.UsersNotFoundException;
 import io.github.vcvitaly.solidgate.task.repo.BalanceUpdateRepo;
+import io.github.vcvitaly.solidgate.task.repo.UserRepo;
 import java.util.Map;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
@@ -16,12 +17,14 @@ import org.springframework.stereotype.Service;
 @Service
 public class BalanceUpdateValidator {
 
-    private final BalanceUpdateRepo repo;
+    private final BalanceUpdateRepo balanceUpdateRepo;
+
+    private final UserRepo userRepo;
 
     public void validateUpdateRequest(String idempotencyKey, Map<Integer, Integer> req) {
         validateIdempotencyKeyNotExists(idempotencyKey);
 
-        final Set<Integer> existingUserIds = repo.getExistingUserIds(req.keySet());
+        final Set<Integer> existingUserIds = userRepo.getExistingUserIds(req.keySet());
 
         validateAllUsersExist(req, existingUserIds);
 
@@ -29,13 +32,13 @@ public class BalanceUpdateValidator {
     }
 
     public void validateIdempotencyKeyExists(String idempotencyKey) {
-        if (!repo.existsRequest(idempotencyKey)) {
+        if (!balanceUpdateRepo.existsRequest(idempotencyKey)) {
             throw new IdempotencyKeyNotFoundException(idempotencyKey);
         }
     }
 
     public void validateIdempotencyKeyNotExists(String idempotencyKey) {
-        if (repo.existsRequest(idempotencyKey)) {
+        if (balanceUpdateRepo.existsRequest(idempotencyKey)) {
             throw new IdempotencyKeyAlreadyExistsException();
         }
     }

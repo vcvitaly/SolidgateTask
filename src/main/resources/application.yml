@@ -8,3 +8,7 @@ spring:
     driverClassName: org.postgresql.Driver
     flyway:
       locations: classpath:db/migration
+
+app:
+  scheduler:
+    enable: true

@@ -11,13 +11,11 @@ public interface BalanceUpdateRepo {
 
     void createBalanceUpdateRequest(String idempotencyKey, String req);
 
-    Set<Integer> getExistingUserIds(Set<Integer> userIds);
-
     boolean existsRequest(String idempotencyKey);
 
     Optional<BalanceUpdateRequest> selectRequest(String idempotencyKey);
 
-    BalanceUpdateRequest selectRequestForUpdate(String idempotencyKey);
+    Optional<BalanceUpdateRequest> selectRequestForUpdate(String idempotencyKey);
 
     List<BalanceUpdateRequest> selectAllRequestsByStatuses(Set<BalanceUpdateRequestStatus> statuses);
 
