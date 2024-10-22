@@ -3,6 +3,7 @@ package io.github.vcvitaly.solidgate.task.repo;
 import io.github.vcvitaly.solidgate.task.enumeration.BalanceUpdateRequestStatus;
 import io.github.vcvitaly.solidgate.task.model.BalanceUpdateRequest;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
@@ -18,11 +19,15 @@ public class JdbcBalanceUpdateRepo implements BalanceUpdateRepo {
             VALUES (:idempotency_key, :status, :request)
             """;
 
+    private static final String GET_EXISTING_USERS_QUERY = """
+            SELECT id FROM users WHERE id = ANY(ARRAY[:ids])
+            """;
+
     private final NamedParameterJdbcTemplate jdbcTemplate;
 
     @Override
     public void createBalanceUpdateRequest(String idempotencyKey, String req) {
-        Map<String, String> params = new HashMap<>();
+        final Map<String, String> params = new HashMap<>();
 
         params.put("idempotency_key", idempotencyKey);
         params.put("status", BalanceUpdateRequestStatus.NEW.name());
@@ -31,7 +36,12 @@ public class JdbcBalanceUpdateRepo implements BalanceUpdateRepo {
 
     @Override
     public Set<Integer> getExistingUserIds(Set<Integer> userIds) {
-        return Set.of();
+        final Map<String, Object> params = Map.of(
+                "ids",
+                userIds.stream().mapToInt(Integer::intValue).toArray()
+        );
+
+        return new HashSet<>(jdbcTemplate.queryForList(GET_EXISTING_USERS_QUERY, params, Integer.class));
     }
 
     @Override

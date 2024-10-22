@@ -11,19 +11,22 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RequiredArgsConstructor
-@RestController("/api/v1/balance-update")
+@RestController
+@RequestMapping(("/api/v1/balance-update"))
 public class BalanceUpdateController {
 
     private final BalanceUpdateService service;
     private final BalanceUpdateValidator validator;
 
-    @PutMapping("/{idempotencyKey}/set-users-balance")
+    @PostMapping("/{idempotencyKey}/set-users-balance")
+    @ResponseStatus(HttpStatus.OK)
     public void setUsersBalance(@PathVariable("idempotencyKey") String idempotencyKey,
                                 @RequestBody Map<Integer, Integer> req) {
         validator.validateUpdateRequest(idempotencyKey, req);

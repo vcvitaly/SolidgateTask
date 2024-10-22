@@ -1,6 +1,6 @@
 package io.github.vcvitaly.solidgate.task.service;
 
-import com.google.common.collect.Sets;
+import io.github.vcvitaly.solidgate.task.exception.IdempotencyKeyAlreadyExistsException;
 import io.github.vcvitaly.solidgate.task.exception.IdempotencyKeyNotFoundException;
 import io.github.vcvitaly.solidgate.task.exception.NegativeBalanceException;
 import io.github.vcvitaly.solidgate.task.exception.UsersNotFoundException;
@@ -19,7 +19,7 @@ public class BalanceUpdateValidator {
     private final BalanceUpdateRepo repo;
 
     public void validateUpdateRequest(String idempotencyKey, Map<Integer, Integer> req) {
-        validateIdempotencyKeyExists(idempotencyKey);
+        validateIdempotencyKeyNotExists(idempotencyKey);
 
         final Set<Integer> existingUserIds = repo.getExistingUserIds(req.keySet());
 
@@ -31,6 +31,12 @@ public class BalanceUpdateValidator {
     public void validateIdempotencyKeyExists(String idempotencyKey) {
         if (!repo.existsRequest(idempotencyKey)) {
             throw new IdempotencyKeyNotFoundException(idempotencyKey);
+        }
+    }
+
+    public void validateIdempotencyKeyNotExists(String idempotencyKey) {
+        if (repo.existsRequest(idempotencyKey)) {
+            throw new IdempotencyKeyAlreadyExistsException();
         }
     }
 
