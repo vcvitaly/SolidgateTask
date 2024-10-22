@@ -74,7 +74,7 @@ public class JdbcBalanceUpdateRepo implements BalanceUpdateRepo {
 
     @Override
     public boolean existsRequest(String idempotencyKey) {
-        return false;
+        return selectRequest(idempotencyKey).isPresent();
     }
 
     @Override
