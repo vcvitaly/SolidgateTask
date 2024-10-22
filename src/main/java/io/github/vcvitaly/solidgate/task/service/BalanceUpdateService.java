@@ -58,7 +58,7 @@ public class BalanceUpdateService {
             reqForUpdate.ifPresent(this::processRequest);
             return reqForUpdate.map(BalanceUpdateRequest::idempotencyKey);
         } catch (Exception e) {
-            throw new BalanceUpdateException(reqForUpdate.get().idempotencyKey().toString(), e);
+            throw new BalanceUpdateException(reqForUpdate.get().idempotencyKey(), e);
         }
     }
 

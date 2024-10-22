@@ -26,9 +26,10 @@ public class BalanceUpdateScheduler {
             if (processed.isEmpty()) {
                 return;
             }
-            log.info("Updated user balances for idempotency key: " + processed);
+            final UUID uuid = processed.get();
+            log.info("Updated user balances for idempotency key: " + uuid);
             update = new BalanceUpdateRequestUpdate(
-                    processed.toString(), BalanceUpdateRequestStatus.COMPLETED.name(), null
+                    uuid, BalanceUpdateRequestStatus.COMPLETED.name(), null
             );
         } catch (RequestLockException e) {
             log.error("Could not process request", e);
