@@ -24,9 +24,16 @@ repositories {
 }
 
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-jdbc'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.flywaydb:flyway-core'
+	implementation 'com.google.guava:guava:33.3.1-jre'
+	runtimeOnly 'org.flywaydb:flyway-database-postgresql:10.10.0'
+	testImplementation "org.testcontainers:testcontainers:1.20.2"
+	testImplementation "org.testcontainers:junit-jupiter:1.20.2"
+	testImplementation "org.testcontainers:postgresql:1.20.2"
+	testImplementation "org.testcontainers:jdbc:1.20.2"
+	testImplementation "org.testcontainers:database-commons:1.20.2"
 	compileOnly 'org.projectlombok:lombok'
 	runtimeOnly 'org.postgresql:postgresql'
 	annotationProcessor 'org.projectlombok:lombok'

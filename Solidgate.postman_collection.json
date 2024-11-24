@@ -1,0 +1,75 @@
+{
+	"info": {
+		"_postman_id": "26c01f68-6b0f-429c-a3e5-70fc5140609a",
+		"name": "Solidgate",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "7399695",
+		"_collection_link": "https://solar-star-756772.postman.co/workspace/Axon~ec004276-18dc-436a-922c-ef3a189a8913/collection/7399695-26c01f68-6b0f-429c-a3e5-70fc5140609a?action=share&source=collection_link&creator=7399695"
+	},
+	"item": [
+		{
+			"name": "set-user-balances",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "file",
+					"file": {
+						"src": "/C:/Users/vcvit/Downloads/req.json"
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/v1/balance-update/:key/set-users-balance",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"balance-update",
+						":key",
+						"set-users-balance"
+					],
+					"variable": [
+						{
+							"key": "key",
+							"value": "f78dfbb9-4a89-4311-a237-ea7649a536d3"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getUpdateRequest",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/v1/balance-update/:key/update-request-status",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"balance-update",
+						":key",
+						"update-request-status"
+					],
+					"variable": [
+						{
+							"key": "key",
+							"value": "f78dfbb9-4a89-4311-a237-ea7649a536d3"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
